@@ -13,5 +13,4 @@ Project scaffold only. Implementation has not started.
 Folders:
 - include: C++ header files
 - src: C++ source files
-- tests: unit and integration test source files
 
