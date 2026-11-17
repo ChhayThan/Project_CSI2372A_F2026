@@ -1,3 +1,5 @@
+#pragma once
+
 // CardDeck declarations will be added here.
 
 #include "DeckFactory.h"

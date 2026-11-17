@@ -1,6 +1,7 @@
 // Card implementation will be added here.
 
 #include "../include/Card.h"
+#include <iostream>
 
 Card::Card(FaceAnimal animal, FaceBackground background) : animal(animal), background(background){}
 
@@ -28,20 +29,20 @@ std::string Card::operator()(int row) const {
 
     // Convert animal enum to its corresponding character
     switch (animal) {
-        case Crab:     animalChar = 'C'; break;
-        case Penguin:  animalChar = 'P'; break;
-        case Octopus:  animalChar = 'O'; break;
-        case Turtle:   animalChar = 'T'; break;
-        case Walrus:   animalChar = 'W'; break;
+        case FaceAnimal::Crab:     animalChar = 'C'; break;
+        case FaceAnimal::Penguin:  animalChar = 'P'; break;
+        case FaceAnimal::Octopus:  animalChar = 'O'; break;
+        case FaceAnimal::Turtle:   animalChar = 'T'; break;
+        case FaceAnimal::Walrus:   animalChar = 'W'; break;
     }
 
     // Convert background enum to its corresponding lowercase character
     switch (background) {
-        case Red:     backgroundChar = 'r'; break;
-        case Green:   backgroundChar = 'g'; break;
-        case Purple:  backgroundChar = 'p'; break;
-        case Blue:    backgroundChar = 'b'; break;
-        case Yellow:  backgroundChar = 'y'; break;
+        case FaceBackground::Red:     backgroundChar = 'r'; break;
+        case FaceBackground::Green:   backgroundChar = 'g'; break;
+        case FaceBackground::Purple:  backgroundChar = 'p'; break;
+        case FaceBackground::Blue:    backgroundChar = 'b'; break;
+        case FaceBackground::Yellow:  backgroundChar = 'y'; break;
     }
 
     // Construct the requested row

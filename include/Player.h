@@ -1,3 +1,5 @@
+#pragma once
+
 // Player declarations will be added here.
 
 // Update the class accordingly "Student 2 work just did bare bone for now"

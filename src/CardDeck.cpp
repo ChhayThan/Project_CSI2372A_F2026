@@ -5,11 +5,11 @@
 
 CardDeck::CardDeck(){
     FaceAnimal animals[] = {
-        Crab, Penguin, Octopus, Turtle, Walrus
+        FaceAnimal::Crab, FaceAnimal::Penguin, FaceAnimal::Octopus, FaceAnimal::Turtle, FaceAnimal::Walrus
     };
 
     FaceBackground backgrounds[] = {
-        Red, Green, Purple, Blue, Yellow
+        FaceBackground::Red, FaceBackground::Green, FaceBackground::Purple, FaceBackground::Blue, FaceBackground::Yellow
     };
 
     for (FaceAnimal animal : animals) {
@@ -19,7 +19,7 @@ CardDeck::CardDeck(){
     }
 }
 
-static CardDeck& CardDeck::make_CardDeck(){
+CardDeck& CardDeck::make_CardDeck(){
     static CardDeck instance; // now it will be same throughout the entire program
     return instance;
 }

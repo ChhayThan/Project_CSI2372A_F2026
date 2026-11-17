@@ -1,3 +1,5 @@
+#pragma once
+
 // Shared type declarations will be added here.
 
 enum class Side{

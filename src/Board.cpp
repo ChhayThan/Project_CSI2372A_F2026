@@ -3,7 +3,7 @@
 #include "../include/Board.h"
 
 
-Board::Board() : numberOfCards(0) {
+Board::Board() {
     CardDeck& deck = CardDeck::make_CardDeck();
     
     for (int r = 0; r < 5; ++r) {
@@ -22,7 +22,6 @@ Board::Board() : numberOfCards(0) {
 
             cards[r][c] = nextCard;
             faceUp[r][c] = false;
-            numberOfCards++;
         }
     }
     

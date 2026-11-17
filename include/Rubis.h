@@ -1,3 +1,5 @@
+#pragma once
+
 // Rubis declarations will be added here.
 
 #include <ostream>

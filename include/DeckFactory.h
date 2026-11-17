@@ -1,3 +1,5 @@
+#pragma once
+
 // DeckFactory declarations will be added here.
 
 // should this class be abstract??!?!?!

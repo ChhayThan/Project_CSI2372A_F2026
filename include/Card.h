@@ -1,3 +1,5 @@
+#pragma once
+
 // Card declarations will be added here.
 
 #include "Types.h"

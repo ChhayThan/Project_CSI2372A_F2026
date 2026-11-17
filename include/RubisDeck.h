@@ -1,3 +1,5 @@
+#pragma once
+
 // RubisDeck declarations will be added here.
 
 #include "DeckFactory.h"

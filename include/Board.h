@@ -1,3 +1,5 @@
+#pragma once
+
 // Board declarations will be added here.
 
 #include "Types.h"
