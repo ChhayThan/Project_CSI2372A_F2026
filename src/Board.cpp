@@ -24,9 +24,6 @@ Board::Board() {
             faceUp[r][c] = false;
         }
     }
-    
-    // Initialize the string representation
-    // updateDisplayBoard();
 }
 
 
@@ -91,7 +88,6 @@ Card* Board::getCard(const Letter& letter, const Number& number){
     return cards[row][col];
 }
 
-// is this correct?ho
 void Board::setCard(const Letter& letter, const Number& number, Card* card){
     int row = static_cast<int>(letter);
     int col = static_cast<int>(number);

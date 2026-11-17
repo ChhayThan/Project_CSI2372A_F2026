@@ -2,8 +2,6 @@
 
 // DeckFactory declarations will be added here.
 
-// should this class be abstract??!?!?!
-
 #include <vector>
 #include <algorithm>
 #include <random>
@@ -21,8 +19,6 @@ class DeckFactory{
         int currentIndex;
         DeckFactory(); // made it protected so only derived class can call it since its an abstract factory
 };
-
-// Template implementation of abstract class above
 
 template <typename C>
 DeckFactory<C>::DeckFactory() : currentIndex(0){}
