@@ -5,10 +5,8 @@ CSI2372A - Fall 2026
 Team members:
 - Name: TODO
   Student number: TODO
-- Name: TODO
-  Student number: TODO
-
-Project scaffold only. Implementation has not started.
+- Name: Eric Chhour
+  Student number: 300349848
 
 Folders:
 - include: C++ header files
