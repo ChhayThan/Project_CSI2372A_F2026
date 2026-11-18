@@ -49,16 +49,16 @@ std::ostream& operator<<(std::ostream& os, const Player& player) {
     }
 
     switch (player.side) {
-        case Side::Top:
+        case Side::top:
             os << "top";
             break;
-        case Side::Bottom:
+        case Side::bottom:
             os << "bottom";
             break;
-        case Side::Left:
+        case Side::left:
             os << "left";
             break;
-        case Side::Right:
+        case Side::right:
             os << "right";
             break;
     }
