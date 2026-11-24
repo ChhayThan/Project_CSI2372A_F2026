@@ -3,10 +3,10 @@
 // Shared type declarations will be added here.
 
 enum class Side{
-    Top, 
-    Bottom, 
-    Left, 
-    Right
+    top, 
+    bottom, 
+    left, 
+    right
 };
 
 enum class FaceAnimal {

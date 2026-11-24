@@ -17,6 +17,7 @@ CardDeck::CardDeck(){
             deck.push_back(new Card(animal, background));
         }
     }
+    shuffle();
 }
 
 CardDeck& CardDeck::make_CardDeck(){

@@ -9,6 +9,6 @@ Rubis::operator int() const{
 }
 
 std::ostream& operator<<(std::ostream& os, const Rubis& rubie) {
-    os << static_cast<int>(rubie) << "rubies";
+    os << static_cast<int>(rubie) << " rubies";
     return os;
 }

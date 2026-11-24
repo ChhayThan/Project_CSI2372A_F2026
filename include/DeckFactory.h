@@ -5,18 +5,22 @@
 #include <vector>
 #include <algorithm>
 #include <random>
+#include <cstddef>
 
 template <typename C>
 class DeckFactory{
     public:
+        DeckFactory(const DeckFactory&) = delete;
+        DeckFactory& operator=(const DeckFactory&) = delete;
+
         void shuffle();
         C* getNext();
         bool isEmpty() const;
-        virtual ~DeckFactory();
+        virtual ~DeckFactory() = 0;
 
     protected:
         std::vector<C*> deck;
-        int currentIndex;
+        std::size_t currentIndex;
         DeckFactory(); // made it protected so only derived class can call it since its an abstract factory
 };
 
@@ -44,4 +48,9 @@ bool DeckFactory<C>::isEmpty() const {
 }
 
 template <typename C>
-DeckFactory<C>::~DeckFactory() = default;
+DeckFactory<C>::~DeckFactory() {
+    // Pure virtual destructors still need a body; derived destructors call this automatically to free deck items.
+    for (C* item : deck) {
+        delete item;
+    }
+}

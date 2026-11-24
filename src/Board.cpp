@@ -77,7 +77,7 @@ bool Board::turnFaceDown(const Letter& letter, const Number& number){
     return true; 
 }
 
-Card* Board::getCard(const Letter& letter, const Number& number){
+Card* Board::getCard(const Letter& letter, const Number& number) const {
     int row = static_cast<int>(letter);
     int col = static_cast<int>(number);
 
@@ -115,6 +115,12 @@ std::ostream& operator<<(std::ostream& os, const Board& board){
 
     for (int row = 0; row < ROWS; row++) {
         for(int cardRow = 0; cardRow < 3; cardRow++){
+            if (cardRow == 1) {
+                os << static_cast<char>('A' + row) << "   ";
+            } else {
+                os << "    ";
+            }
+
             for (int col = 0; col < COLS; col++) {
                 if(row == 2 && col == 2){
                     os << "   ";
@@ -128,13 +134,19 @@ std::ostream& operator<<(std::ostream& os, const Board& board){
                     }
                 }
 
-                if(col < 4){
+                if(col < COLS - 1){
                     os << " ";
-                } 
+                }
             }
             os << "\n";
         }
+
+        if (row < ROWS - 1) {
+            os << "\n";
+        }
     }
+
+    os << "\n     1   2   3   4   5\n";
 
     return os;
 }
