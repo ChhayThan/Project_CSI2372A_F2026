@@ -245,6 +245,86 @@ void showPrivatePreviews(
     }
 }
 
+// Returns true when at least one non-center card remains face down.
+bool hasFaceDownCard(const Game& game) {
+    const Letter letters[] = {
+        Letter::A, Letter::B, Letter::C, Letter::D, Letter::E
+    };
+    const Number numbers[] = {
+        Number::One,
+        Number::Two,
+        Number::Three,
+        Number::Four,
+        Number::Five
+    };
+
+    for (Letter letter : letters) {
+        for (Number number : numbers) {
+            if (letter == Letter::C && number == Number::Three) {
+                continue;
+            }
+
+            if (!game.isFaceUp(letter, number)) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+// Returns the sole active player after a round has ended.
+Player& getRoundWinner(Game& game) {
+    for (const Player& player : game.getPlayers()) {
+        if (player.isActive()) {
+            return game.getPlayer(player.getSide());
+        }
+    }
+
+    throw std::logic_error("Round ended without an active player.");
+}
+
+// Runs base-game turns until only one player remains active.
+Player& playRound(
+    Game& game,
+    Rules& rules,
+    std::istream& inputStream,
+    std::ostream& output
+) {
+    while (!rules.roundOver(game)) {
+        const Player& selectedPlayer = rules.getNextPlayer(game);
+        const Side selectedSide = selectedPlayer.getSide();
+
+        output << "\n" << selectedPlayer.getName() << "'s turn.\n";
+
+        if (!hasFaceDownCard(game)) {
+            output << "No face-down cards remain. " << selectedPlayer.getName()
+                   << " is out of this round.\n";
+            game.getPlayer(selectedSide).setActive(false);
+            output << game;
+            continue;
+        }
+
+        const input::Position position =
+            input::readFaceDownPosition(game, inputStream, output);
+
+        game.turnFaceUp(position.letter, position.number);
+        game.setCurrentCard(game.getCard(position.letter, position.number));
+
+        if (rules.isValid(game)) {
+            output << "The selected card is valid.\n";
+        } else {
+            output << "The selected card does not match. "
+                   << selectedPlayer.getName() << " is out of this round.\n";
+            game.getPlayer(selectedSide).setActive(false);
+        }
+
+        output << game;
+    }
+
+    return getRoundWinner(game);
+}
+
 } // namespace
 
 int main() {
@@ -279,6 +359,10 @@ int main() {
 
         std::cout << "Round " << game.getRound() + 1 << " is ready.\n\n";
         std::cout << game;
+
+        Player& roundWinner = playRound(game, rules, std::cin, std::cout);
+        std::cout << "\n" << roundWinner.getName() << " wins round "
+                  << game.getRound() + 1 << ".\n";
     } catch (const std::exception& error) {
         std::cerr << "Unable to create the game: " << error.what() << '\n';
         return 1;
