@@ -1,37 +1,50 @@
 #pragma once
 
-// Player declarations will be added here.
-
-// Update the class accordingly "Student 2 work just did bare bone for now"
-
 #include "Types.h"
-#include "Rubis.h"
+
+#include <iosfwd>
 #include <string>
-#include <ostream>
 
-class Player{
-    public:
-        Player(const std::string&, Side);
-        
-        std::string getName() const;
+class Rubis;
 
-        void setActive(bool);
-        bool isActive() const;
+// Stores one player's identity, board position, round status, and ruby score.
+class Player {
+public:
+    // Creates an active player with no rubies.
+    Player(const std::string& name, Side side);
 
-        int getNRubies() const;
-        void addRubis(const Rubis&);
+    // Returns the player's name.
+    std::string getName() const;
 
-        void setDisplayMode(bool);
+    // Changes whether the player is active in the current round.
+    void setActive(bool active);
 
-        Side getSide() const;
-        void setSide(Side);
-        
-        friend std::ostream& operator<<(std::ostream& os, const Player& player);
+    // Returns true when the player is active in the current round.
+    bool isActive() const;
 
-    private:
-        std::string name;
-        bool status;
-        int rubies;
-        Side playerSide;
-        bool endOfGame;
+    // Returns the total number of rubies won by the player.
+    int getNRubies() const;
+
+    // Adds the value of a ruby card to the player's score.
+    void addRubis(const Rubis& rubis);
+
+    // Selects regular status output or end-of-game score output.
+    void setDisplayMode(bool endOfGame);
+
+    // Returns the player's side of the board.
+    Side getSide() const;
+
+    // Changes the player's side of the board.
+    void setSide(Side side);
+
+    // Prints the player's round status or final ruby score.
+    friend std::ostream& operator<<(std::ostream& os, const Player& player);
+
+private:
+    std::string name;
+    Side side;
+    bool active;
+    int rubies;
+    bool endOfGame;
 };
+
