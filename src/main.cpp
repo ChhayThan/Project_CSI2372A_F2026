@@ -1,6 +1,7 @@
 #include "CardDeck.h"
 #include "Game.h"
 #include "Player.h"
+#include "Rules.h"
 #include "RubisDeck.h"
 
 #include <exception>
@@ -86,6 +87,103 @@ std::vector<Side> getPlayerSides(int playerCount) {
     return {Side::top, Side::bottom, Side::left, Side::right};
 }
 
+// Identifies one card position on the Board.
+struct Position {
+    Letter letter;
+    Number number;
+};
+
+// Returns the three cards directly in front of the requested board side.
+std::vector<Position> getPreviewPositions(Side side) {
+    switch (side) {
+        case Side::top:
+            return {
+                {Letter::A, Number::Two},
+                {Letter::A, Number::Three},
+                {Letter::A, Number::Four}
+            };
+        case Side::bottom:
+            return {
+                {Letter::E, Number::Two},
+                {Letter::E, Number::Three},
+                {Letter::E, Number::Four}
+            };
+        case Side::left:
+            return {
+                {Letter::B, Number::One},
+                {Letter::C, Number::One},
+                {Letter::D, Number::One}
+            };
+        case Side::right:
+            return {
+                {Letter::B, Number::Five},
+                {Letter::C, Number::Five},
+                {Letter::D, Number::Five}
+            };
+    }
+
+    throw std::logic_error("Player has an invalid board side.");
+}
+
+// Waits for the user to press Enter and reports an unexpected end of input.
+void waitForEnter(std::istream& input) {
+    std::string line;
+    if (!std::getline(input, line)) {
+        throw std::runtime_error("Input ended during the private card preview.");
+    }
+}
+
+// Resets all state required at the beginning of a round.
+void initializeRound(Game& game, Rules& rules) {
+    game.allFacesDown();
+    game.setCurrentCard(nullptr);
+    rules.resetTurnOrder();
+
+    for (const Player& player : game.getPlayers()) {
+        game.getPlayer(player.getSide()).setActive(true);
+    }
+}
+
+// Reveals and then hides the three cards directly in front of one player.
+void showPrivatePreview(
+    Game& game,
+    const Player& player,
+    std::istream& input,
+    std::ostream& output
+) {
+    const std::vector<Position> positions = getPreviewPositions(player.getSide());
+
+    output << "\n" << player.getName()
+           << ", ask the other players to look away, then press Enter to view your cards.";
+    waitForEnter(input);
+
+    for (const Position& position : positions) {
+        game.turnFaceUp(position.letter, position.number);
+    }
+
+    output << "\n" << game;
+    output << "Press Enter when you are finished viewing your cards.";
+    waitForEnter(input);
+
+    for (const Position& position : positions) {
+        game.turnFaceDown(position.letter, position.number);
+    }
+
+    // Move the previous preview out of immediate view before the next player.
+    output << std::string(25, '\n');
+}
+
+// Gives every player their private preview in insertion order.
+void showPrivatePreviews(
+    Game& game,
+    std::istream& input,
+    std::ostream& output
+) {
+    for (const Player& player : game.getPlayers()) {
+        showPrivatePreview(game, player, input, output);
+    }
+}
+
 } // namespace
 
 int main() {
@@ -111,7 +209,14 @@ int main() {
             game.addPlayer(Player(playerNames[index], playerSides[index]));
         }
 
-        std::cout << "\nBase game created successfully.\n\n";
+        Rules rules;
+        initializeRound(game, rules);
+
+        std::cout << "\nBase game created successfully.\n";
+        std::cout << "Preparing round " << game.getRound() + 1 << ".\n";
+        showPrivatePreviews(game, std::cin, std::cout);
+
+        std::cout << "Round " << game.getRound() + 1 << " is ready.\n\n";
         std::cout << game;
     } catch (const std::exception& error) {
         std::cerr << "Unable to create the game: " << error.what() << '\n';
