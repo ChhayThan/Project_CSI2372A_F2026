@@ -6,12 +6,6 @@
 #include <string>
 
 class Rubis;
-enum class Side {
-    top,
-    bottom,
-    left,
-    right
-};
 
 // Stores one player's identity, board position, round status, and ruby score.
 class Player {
