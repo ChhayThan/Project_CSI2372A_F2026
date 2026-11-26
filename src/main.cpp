@@ -4,6 +4,7 @@
 #include "Rules.h"
 #include "RubisDeck.h"
 
+#include <algorithm>
 #include <cctype>
 #include <exception>
 #include <iostream>
@@ -325,6 +326,79 @@ Player& playRound(
     return getRoundWinner(game);
 }
 
+// Awards the next ruby card to a round winner and advances the round count.
+void awardRoundWinner(
+    Game& game,
+    Player& winner,
+    RubisDeck& rubisDeck,
+    std::ostream& output
+) {
+    Rubis* reward = rubisDeck.getNext();
+    if (reward == nullptr) {
+        throw std::logic_error("Ruby deck was exhausted before all rounds were completed.");
+    }
+
+    const int completedRound = game.getRound() + 1;
+    winner.addRubis(*reward);
+    game.setRound(completedRound);
+
+    const int rubyCount = static_cast<int>(*reward);
+    output << winner.getName() << " wins round " << completedRound
+           << " and receives " << rubyCount
+           << (rubyCount == 1 ? " ruby.\n" : " rubies.\n");
+}
+
+// Prints a list of tied winner names.
+void printWinnerNames(
+    const std::vector<Player>& winners,
+    std::ostream& output
+) {
+    for (std::vector<Player>::size_type index = 0; index < winners.size(); ++index) {
+        if (index > 0) {
+            output << (index + 1 == winners.size() ? " and " : ", ");
+        }
+        output << winners[index].getName();
+    }
+}
+
+// Prints final scores from least to most rubies and announces every top scorer.
+void displayFinalResults(const Game& game, std::ostream& output) {
+    std::vector<Player> rankings = game.getPlayers();
+    if (rankings.empty()) {
+        throw std::logic_error("Cannot display results for a game without players.");
+    }
+
+    for (Player& player : rankings) {
+        player.setDisplayMode(true);
+    }
+
+    std::stable_sort(
+        rankings.begin(),
+        rankings.end(),
+        [](const Player& left, const Player& right) {
+            return left.getNRubies() < right.getNRubies();
+        }
+    );
+
+    output << "\nFinal scores (least to most rubies):\n";
+    for (const Player& player : rankings) {
+        output << player << '\n';
+    }
+
+    const int winningScore = rankings.back().getNRubies();
+    std::vector<Player> winners;
+    for (const Player& player : rankings) {
+        if (player.getNRubies() == winningScore) {
+            winners.push_back(player);
+        }
+    }
+
+    output << (winners.size() == 1 ? "Winner: " : "Winners: ");
+    printWinnerNames(winners, output);
+    output << " with " << winningScore
+           << (winningScore == 1 ? " ruby.\n" : " rubies.\n");
+}
+
 } // namespace
 
 int main() {
@@ -341,7 +415,7 @@ int main() {
 
         // Construct and shuffle both singleton decks before gameplay begins.
         CardDeck::make_CardDeck();
-        RubisDeck::make_RubisDeck();
+        RubisDeck& rubisDeck = RubisDeck::make_RubisDeck();
 
         Game game;
         const std::vector<Side> playerSides = getPlayerSides(playerCount);
@@ -350,19 +424,24 @@ int main() {
             game.addPlayer(Player(playerNames[index], playerSides[index]));
         }
 
-        Rules rules;
-        initializeRound(game, rules);
-
         std::cout << "\nBase game created successfully.\n";
-        std::cout << "Preparing round " << game.getRound() + 1 << ".\n";
-        showPrivatePreviews(game, std::cin, std::cout);
+        Rules rules;
 
-        std::cout << "Round " << game.getRound() + 1 << " is ready.\n\n";
-        std::cout << game;
+        while (!rules.gameOver(game)) {
+            initializeRound(game, rules);
 
-        Player& roundWinner = playRound(game, rules, std::cin, std::cout);
-        std::cout << "\n" << roundWinner.getName() << " wins round "
-                  << game.getRound() + 1 << ".\n";
+            std::cout << "\nPreparing round " << game.getRound() + 1 << ".\n";
+            showPrivatePreviews(game, std::cin, std::cout);
+
+            std::cout << "Round " << game.getRound() + 1 << " is ready.\n\n";
+            std::cout << game;
+
+            Player& roundWinner = playRound(game, rules, std::cin, std::cout);
+            std::cout << '\n';
+            awardRoundWinner(game, roundWinner, rubisDeck, std::cout);
+        }
+
+        displayFinalResults(game, std::cout);
     } catch (const std::exception& error) {
         std::cerr << "Unable to create the game: " << error.what() << '\n';
         return 1;
