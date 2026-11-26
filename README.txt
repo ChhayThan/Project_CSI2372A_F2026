@@ -5,10 +5,8 @@ CSI2372A - Fall 2026
 Team members:
 - Name: Shuaib Salad
   Student number: 300353229
-- Name: TODO
-  Student number: TODO
-
-Project scaffold only. Implementation has not started.
+- Name: Eric Chhour
+  Student number: 300349848
 
 Folders:
 - include: C++ header files
