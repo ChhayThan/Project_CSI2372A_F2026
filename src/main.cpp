@@ -4,6 +4,7 @@
 #include "Rules.h"
 #include "RubisDeck.h"
 
+#include <cctype>
 #include <exception>
 #include <iostream>
 #include <sstream>
@@ -11,7 +12,13 @@
 #include <string>
 #include <vector>
 
-namespace {
+namespace input {
+
+// Identifies one card position on the Board.
+struct Position {
+    Letter letter;
+    Number number;
+};
 
 // Removes leading and trailing whitespace from user-entered text.
 std::string trim(const std::string& text) {
@@ -25,6 +32,66 @@ std::string trim(const std::string& text) {
     const std::string::size_type last = text.find_last_not_of(whitespace);
     return text.substr(first, last - first + 1);
 }
+
+// Converts a coordinate such as A1 or d4 into its Board enumerations.
+bool parsePosition(const std::string& text, Position& position) {
+    const std::string coordinate = trim(text);
+    if (coordinate.size() != 2) {
+        return false;
+    }
+
+    const char row = static_cast<char>(
+        std::toupper(static_cast<unsigned char>(coordinate[0]))
+    );
+    const char column = coordinate[1];
+
+    if (row < 'A' || row > 'E' || column < '1' || column > '5') {
+        return false;
+    }
+
+    position.letter = static_cast<Letter>(row - 'A');
+    position.number = static_cast<Number>(column - '1');
+    return true;
+}
+
+// Reads a valid, face-down, non-center Board position.
+Position readFaceDownPosition(
+    const Game& game,
+    std::istream& input,
+    std::ostream& output
+) {
+    std::string line;
+
+    while (true) {
+        output << "Select a face-down card (A1-E5): ";
+
+        if (!std::getline(input, line)) {
+            throw std::runtime_error("Input ended before a card was selected.");
+        }
+
+        Position position{};
+        if (!parsePosition(line, position)) {
+            output << "Invalid coordinate. Enter a row A-E followed by a column 1-5.\n";
+            continue;
+        }
+
+        if (position.letter == Letter::C && position.number == Number::Three) {
+            output << "C3 is the empty center and cannot be selected.\n";
+            continue;
+        }
+
+        if (game.isFaceUp(position.letter, position.number)) {
+            output << "That card is already face up. Choose another card.\n";
+            continue;
+        }
+
+        return position;
+    }
+}
+
+} // namespace input
+
+namespace {
 
 // Reads a player count from two through four, retrying after invalid input.
 int readPlayerCount(std::istream& input, std::ostream& output) {
@@ -65,7 +132,7 @@ std::string readPlayerName(
             throw std::runtime_error("Input ended before all player names were entered.");
         }
 
-        name = trim(name);
+        name = input::trim(name);
         if (!name.empty()) {
             return name;
         }
@@ -87,14 +154,8 @@ std::vector<Side> getPlayerSides(int playerCount) {
     return {Side::top, Side::bottom, Side::left, Side::right};
 }
 
-// Identifies one card position on the Board.
-struct Position {
-    Letter letter;
-    Number number;
-};
-
 // Returns the three cards directly in front of the requested board side.
-std::vector<Position> getPreviewPositions(Side side) {
+std::vector<input::Position> getPreviewPositions(Side side) {
     switch (side) {
         case Side::top:
             return {
@@ -151,13 +212,13 @@ void showPrivatePreview(
     std::istream& input,
     std::ostream& output
 ) {
-    const std::vector<Position> positions = getPreviewPositions(player.getSide());
+    const std::vector<input::Position> positions = getPreviewPositions(player.getSide());
 
     output << "\n" << player.getName()
            << ", ask the other players to look away, then press Enter to view your cards.";
     waitForEnter(input);
 
-    for (const Position& position : positions) {
+    for (const input::Position& position : positions) {
         game.turnFaceUp(position.letter, position.number);
     }
 
@@ -165,7 +226,7 @@ void showPrivatePreview(
     output << "Press Enter when you are finished viewing your cards.";
     waitForEnter(input);
 
-    for (const Position& position : positions) {
+    for (const input::Position& position : positions) {
         game.turnFaceDown(position.letter, position.number);
     }
 
